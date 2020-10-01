@@ -6,9 +6,8 @@ import Social from '../components/Social';
 // import config from '../config/config';
 import Layout from '../components/layout';
 
-import { database } from '../firebase.js';
-
 require('../../node_modules/prismjs/themes/prism-tomorrow.css');
+require('../../node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css');
 
 const GITHUB_USERNAME = 'rizafahmi';
 const GITHUB_REPO = 'rizafahmi.com-v2';
@@ -17,52 +16,23 @@ class BlogPostTemplate extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: null
+      data: null,
+      showModal: false
     };
   }
-
-  componentDidMount() {
-    document.addEventListener('scroll', this.trackScroll);
-
-    database
-      .ref()
-      .child(this.props.pageContext.slug)
-      .on('value', (snapshot) => {
-        this.setState({
-          data: snapshot.val()
-        });
-      });
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('scroll', this.trackScroll);
-  }
-
-  updateData = () => {
-    const newData = this.state.data + 1;
-    database
-      .ref()
-      .child(this.props.pageContext.slug)
-      .set(newData);
-  };
-
-  isBottom(el) {
-    return el.getBoundingClientRect().bottom <= window.innerHeight + 600;
-  }
-
-  trackScroll = () => {
-    const wrappedElement = document.getElementById('___gatsby');
-    if (this.isBottom(wrappedElement)) {
-      this.updateData();
-      document.removeEventListener('scroll', this.trackScroll);
-    }
+  handleModal = (e) => {
+    e.preventDefault();
+    this.setState({
+      showModal: !this.state.showModal
+    });
   };
 
   render() {
-    const post = this.props.data.markdownRemark;
+    let post = this.props.data.markdownRemark;
     const { previous, next } = this.props.pageContext;
     const url = 'https://rizafahmi.com' + this.props.location.pathname;
     const { slug } = this.props.pageContext;
+    post.fields = { slug };
     const editUrl = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/edit/master/src/pages${slug}index.md`;
 
     return (
@@ -85,7 +55,6 @@ class BlogPostTemplate extends React.Component {
               📅
             </span>{' '}
             {post.frontmatter.date} 📗 {post.timeToRead} minutes read,{' '}
-            {this.state.data} 👀 |{' '}
             <a href={editUrl} target="_blank" rel="noopener noreferrer">
               Edit on GitHub
             </a>
@@ -94,10 +63,41 @@ class BlogPostTemplate extends React.Component {
             className="blog-content leading-loose"
             dangerouslySetInnerHTML={{ __html: post.html }}
           />
-          <div>
+          <div className="typo">
             <a href={editUrl} target="_blank" rel="noopener noreferrer">
               Find a typo? Edit on GitHub
             </a>
+          </div>
+          <div className="mt-16 pt-8 social-content text-center border-t">
+            <p className="font-light">
+              Did you enjoy this post? Buy me some{' '}
+              <span role="img" aria-label="traktir" style={{ fontSize: 32 }}>
+                ☕
+              </span>{' '}
+              with gopay or ovo.
+            </p>
+            <ul class="list-reset inline-flex">
+              <li class="p-4">
+                <div
+                  role="button"
+                  tabindex="0"
+                  className="SocialMediaShareButton SocialMediaShareButton--twitter button"
+                >
+                  <div style={{ width: 256 }}>
+                    <a
+                      href="https://karyakarsa.com/checkout/207"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        alt="karyakarsa logo"
+                        src={require('../images/karyakarsa-logo-black.svg')}
+                      />
+                    </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
           <div className="mt-16 pt-8 social-content text-center border-t">
             <p className="font-light">
@@ -144,6 +144,58 @@ class BlogPostTemplate extends React.Component {
             </li>
           </ul>
         </div>
+        <a
+          href="javascript:;"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Traktir saya segelas kopi"
+          onClick={this.handleModal}
+          className="float"
+          style={{
+            position: 'fixed',
+            width: '60px',
+            height: '60px',
+            right: '40px',
+            backgroundColor: '#FFF383',
+            borderRadius: '50px',
+            textAlign: 'center',
+            boxShadow: '2px 2px 3px #999',
+            fontSize: '3em',
+            bottom: '18px'
+          }}
+          alt="Traktir saya segelas kopi"
+        >
+          {this.state.showModal === true ? (
+            <svg focusable="false" aria-hidden="true" width="16" height="20">
+              <path
+                fill="#ff00ff"
+                d="M13.978 12.637l-1.341 1.341L6.989 8.33l-5.648 5.648L0 12.637l5.648-5.648L0 1.341 1.341 0l5.648 5.648L12.637 0l1.341 1.341L8.33 6.989l5.648 5.648z"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          ) : (
+            '☕'
+          )}
+        </a>
+        {this.state.showModal === true && (
+          <iframe
+            src="https://karyakarsa.com/checkout/207"
+            className="modal"
+            style={{
+              backgroundColor: '#fff',
+              position: 'fixed',
+              margin: 0,
+              padding: 0,
+              right: '18px',
+              bottom: '98px',
+              width: 400,
+              maxWidth: 500,
+              height: 'calc(100% - 140px)',
+              boxShadow: 'rgba(0, 0, 0, 0.4) 0px 8px 16px',
+              zIndex: 999
+            }}
+          ></iframe>
+        )}
       </Layout>
     );
   }

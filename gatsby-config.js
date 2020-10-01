@@ -12,7 +12,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        trackingId: '<your-google-analytics-tracking-id>',
+        trackingId: 'UA-100507458-1',
         head: true,
         anonymize: true,
         respectDNT: false,
@@ -38,7 +38,9 @@ module.exports = {
           {
             resolve: `gatsby-remark-images`,
             options: {
-              maxWidth: 1140
+              maxWidth: 1140,
+              showCaptions: true,
+              markdownCaptions: true
             }
           },
           {
@@ -54,10 +56,12 @@ module.exports = {
             }
           },
           'gatsby-remark-copy-linked-files',
-          'gatsby-remark-smartypants'
+          'gatsby-remark-smartypants',
+          'gatsby-remark-autolink-headers'
         ]
       }
     },
-    'gatsby-plugin-react-helmet'
+    'gatsby-plugin-react-helmet',
+    'gatsby-plugin-draft'
   ]
 };
